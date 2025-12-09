@@ -1,0 +1,11 @@
+# AI舌象分析Demo所需依赖
+
+# Web框架
+Flask==3.0.0
+Werkzeug==3.0.1
+
+# AI SDK（可选，没有则使用规则引擎）
+zhipuai==2.0.1
+
+# 图像处理（可选）
+# Pillow==10.1.0

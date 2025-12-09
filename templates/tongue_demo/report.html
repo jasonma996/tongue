@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>你的健康地图 - 舌观世界</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --secondary: #8b5cf6;
+            --accent: #ec4899;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-dark: #0f172a;
+            --text-primary: #ffffff;
+            --text-secondary: #cbd5e1;
+            --glass-bg: rgba(255, 255, 255, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .background::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(139, 92, 246, 0.3) 0%, transparent 70%);
+            animation: pulse 15s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Brand Header */
+        .brand-header {
+            text-align: center;
+            margin-bottom: 40px;
+            animation: fadeInDown 0.8s ease;
+        }
+
+        .brand-motto {
+            font-size: clamp(24px, 4vw, 42px);
+            font-weight: 700;
+            background: linear-gradient(135deg, #fff 0%, #a78bfa 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+            letter-spacing: -1px;
+        }
+
+        .brand-subtitle {
+            font-size: 16px;
+            color: var(--text-secondary);
+            font-weight: 400;
+        }
+
+        /* Glass Card */
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 24px;
+            padding: 40px;
+            margin-bottom: 24px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.37);
+            animation: fadeInUp 0.6s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .glass-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            transition: left 0.5s;
+        }
+
+        .glass-card:hover::before {
+            left: 100%;
+        }
+
+        /* Score Section */
+        .score-section {
+            text-align: center;
+            padding: 40px;
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(139, 92, 246, 0.2));
+            border-radius: 20px;
+            margin-bottom: 30px;
+        }
+
+        .score-circle {
+            width: 200px;
+            height: 200px;
+            margin: 0 auto 20px;
+            position: relative;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 40px rgba(99, 102, 241, 0.4);
+        }
+
+        .score-number {
+            font-size: 72px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #fff 0%, #a78bfa 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .score-label {
+            font-size: 18px;
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+        }
+
+        .constitution-badge {
+            display: inline-block;
+            padding: 12px 30px;
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50px;
+            font-size: 20px;
+            font-weight: 600;
+            margin-top: 10px;
+            backdrop-filter: blur(10px);
+        }
+
+        /* Health Map Section - NEW */
+        .health-map-section {
+            background: linear-gradient(135deg, rgba(236, 72, 153, 0.15), rgba(99, 102, 241, 0.15));
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 30px;
+        }
+
+        .map-title {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .map-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .map-region {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+            padding: 24px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .map-region::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.2) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .map-region:hover {
+            transform: translateY(-5px);
+            border-color: rgba(99, 102, 241, 0.5);
+            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.3);
+        }
+
+        .map-region:hover::before {
+            opacity: 1;
+        }
+
+        .region-icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+        }
+
+        .region-name {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .region-status {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .region-index {
+            display: inline-block;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .index-high { background: rgba(239, 68, 68, 0.3); color: #fca5a5; }
+        .index-medium { background: rgba(245, 158, 11, 0.3); color: #fcd34d; }
+        .index-low { background: rgba(16, 185, 129, 0.3); color: #6ee7b7; }
+
+        /* Planet Section - NEW */
+        .planet-section {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(236, 72, 153, 0.15));
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .planet-icon {
+            font-size: 100px;
+            margin-bottom: 20px;
+            display: inline-block;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .planet-name {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .planet-stats {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .planet-stat {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        /* Content Recommendations - NEW */
+        .recommendations-section {
+            margin-top: 40px;
+        }
+
+        .section-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .content-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 24px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .content-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(99, 102, 241, 0.5);
+            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.3);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .content-type {
+            display: inline-block;
+            padding: 4px 12px;
+            background: rgba(99, 102, 241, 0.3);
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .content-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+
+        .content-desc {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 12px;
+        }
+
+        .content-meta {
+            display: flex;
+            gap: 15px;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        /* Actions */
+        .actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 40px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            position: relative;
+            padding: 16px 40px;
+            border-radius: 16px;
+            font-size: 16px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            box-shadow: 0 4px 20px rgba(99, 102, 241, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(99, 102, 241, 0.6);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            backdrop-filter: blur(10px);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Animations */
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Loading */
+        .loading {
+            text-align: center;
+            padding: 80px 20px;
+        }
+
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .glass-card {
+                padding: 24px;
+            }
+
+            .score-circle {
+                width: 160px;
+                height: 160px;
+            }
+
+            .score-number {
+                font-size: 56px;
+            }
+
+            .health-map-section, .planet-section {
+                padding: 24px;
+            }
+
+            .map-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .actions {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+
+        /* Feature sections */
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .feature-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 16px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .feature-label {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+        }
+
+        .feature-value {
+            font-size: 17px;
+            font-weight: 600;
+        }
+
+        .advice-section {
+            margin: 30px 0;
+        }
+
+        .advice-grid {
+            display: grid;
+            gap: 16px;
+        }
+
+        .advice-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 24px;
+            transition: all 0.3s ease;
+        }
+
+        .advice-card:hover {
+            border-color: rgba(99, 102, 241, 0.5);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .advice-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .advice-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .advice-list li {
+            padding: 10px 0;
+            padding-left: 30px;
+            position: relative;
+            line-height: 1.6;
+        }
+
+        .advice-list li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: var(--success);
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .tag-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .tag {
+            background: rgba(99, 102, 241, 0.2);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="background"></div>
+
+    <div class="container">
+        <!-- Brand Header -->
+        <div class="brand-header">
+            <div class="brand-motto">🌍 舌观世界，洞见自己</div>
+            <div class="brand-subtitle">你的舌象，世界的一部分</div>
+        </div>
+
+        <div id="loading" class="loading">
+            <div class="spinner"></div>
+            <p style="color: white; font-size: 18px;">正在生成你的健康地图...</p>
+        </div>
+
+        <div id="reportContent" style="display: none;">
+            <!-- Score Section -->
+            <div class="glass-card">
+                <div class="score-section">
+                    <h2 style="margin-bottom: 20px;">你的健康评分</h2>
+                    <div class="score-circle">
+                        <div class="score-number" id="scoreNumber">0</div>
+                    </div>
+                    <div class="score-label" id="scoreLevel">评估中...</div>
+                    <div class="constitution-badge" id="constitutionType">-</div>
+                </div>
+            </div>
+
+            <!-- Health Map Section -->
+            <div class="glass-card">
+                <div class="health-map-section">
+                    <div class="map-title">
+                        🗺️ 你的健康地图
+                    </div>
+                    <p style="color: var(--text-secondary); margin-bottom: 20px;">
+                        你的舌象就像一张健康地图，不同区域反映了身体的不同状态
+                    </p>
+                    <div class="map-grid" id="healthMapGrid"></div>
+                </div>
+            </div>
+
+            <!-- Planet Section -->
+            <div class="glass-card">
+                <div class="planet-section">
+                    <div class="planet-icon" id="planetIcon">🌟</div>
+                    <div class="planet-name">
+                        <span>你属于</span>
+                        <span id="planetName" style="color: var(--primary);">健康星球</span>
+                    </div>
+                    <p style="color: var(--text-secondary); margin: 15px 0;" id="planetDesc">
+                        与你相似健康状态的人组成了这个星球社区
+                    </p>
+                    <div class="planet-stats">
+                        <div class="planet-stat">
+                            <div class="stat-value" id="planetPopulation">2.3万</div>
+                            <div class="stat-label">星球居民</div>
+                        </div>
+                        <div class="planet-stat">
+                            <div class="stat-value" id="planetStories">1,234</div>
+                            <div class="stat-label">改善故事</div>
+                        </div>
+                        <div class="planet-stat">
+                            <div class="stat-value" id="planetTips">567</div>
+                            <div class="stat-label">健康建议</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tongue Features -->
+            <div class="glass-card">
+                <div class="section-title">👅 舌象特征</div>
+                <div class="feature-grid">
+                    <div class="feature-item">
+                        <div class="feature-label">舌色</div>
+                        <div class="feature-value" id="tongueColor">-</div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-label">舌形</div>
+                        <div class="feature-value" id="tongueShape">-</div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-label">苔色</div>
+                        <div class="feature-value" id="coatingColor">-</div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-label">苔质</div>
+                        <div class="feature-value" id="coatingThickness">-</div>
+                    </div>
+                </div>
+                <div id="constitutionDesc" style="margin-top: 20px; padding: 20px; background: rgba(255,255,255,0.05); border-radius: 12px; line-height: 1.8;"></div>
+            </div>
+
+            <!-- Health Advice -->
+            <div class="glass-card">
+                <div class="advice-section">
+                    <div class="section-title">🍎 饮食建议</div>
+                    <div class="advice-grid">
+                        <div class="advice-card">
+                            <div class="advice-title">✅ 推荐食物</div>
+                            <div class="tag-grid" id="recommendedFoods"></div>
+                        </div>
+                        <div class="advice-card">
+                            <div class="advice-title">⚠️ 避免食物</div>
+                            <div class="tag-grid" id="avoidFoods"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="advice-section">
+                    <div class="section-title">💡 生活建议</div>
+                    <ul class="advice-list" id="lifestyleAdvice"></ul>
+                </div>
+
+                <div class="advice-section">
+                    <div class="section-title">✋ 穴位按摩</div>
+                    <ul class="advice-list" id="acupointAdvice"></ul>
+                </div>
+
+                <div class="advice-section">
+                    <div class="section-title">🌿 中药食疗</div>
+                    <div class="tag-grid" id="herbsList"></div>
+                </div>
+            </div>
+
+            <!-- Content Recommendations -->
+            <div class="glass-card">
+                <div class="recommendations-section">
+                    <div class="section-title">📚 为你推荐的健康故事</div>
+                    <div class="content-grid" id="contentRecommendations"></div>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="actions">
+                <button class="btn btn-primary" onclick="window.location.href='/'">
+                    🔄 再次分析
+                </button>
+                <button class="btn btn-secondary" onclick="window.location.href='/demo'">
+                    🌟 探索健康星球
+                </button>
+                <button class="btn btn-secondary" onclick="shareReport()">
+                    📤 分享报告
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script>
+        const resultData = JSON.parse(sessionStorage.getItem('analysisResult') || '{}');
+
+        if (!resultData || Object.keys(resultData).length === 0) {
+            alert('未找到分析结果，请先进行舌象分析');
+            window.location.href = '/';
+        } else {
+            setTimeout(() => {
+                displayReport(resultData);
+            }, 1500);
+        }
+
+        function displayReport(data) {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('reportContent').style.display = 'block';
+
+            // Score animation
+            animateScore(data.health_score || 75);
+            document.getElementById('scoreLevel').textContent = data.score_level || '良好';
+            document.getElementById('constitutionType').textContent = data.constitution?.primary || '未知体质';
+
+            // Health Map
+            renderHealthMap(data);
+
+            // Planet assignment
+            assignPlanet(data);
+
+            // Features
+            document.getElementById('tongueColor').textContent = data.tongue_body?.color || '-';
+            document.getElementById('tongueShape').textContent = data.tongue_body?.shape || '-';
+            document.getElementById('coatingColor').textContent = data.tongue_coating?.color || '-';
+            document.getElementById('coatingThickness').textContent = data.tongue_coating?.thickness || '-';
+            document.getElementById('constitutionDesc').textContent = data.constitution?.description || '';
+
+            // Advice
+            const recommended = data.advice?.diet?.recommended || [];
+            const avoid = data.advice?.diet?.avoid || [];
+            document.getElementById('recommendedFoods').innerHTML = recommended.map(f => `<div class="tag">${f}</div>`).join('');
+            document.getElementById('avoidFoods').innerHTML = avoid.map(f => `<div class="tag">${f}</div>`).join('');
+
+            const lifestyle = data.advice?.lifestyle || [];
+            document.getElementById('lifestyleAdvice').innerHTML = lifestyle.map(a => `<li>${a}</li>`).join('');
+
+            const acupoints = data.advice?.acupoints || [];
+            document.getElementById('acupointAdvice').innerHTML = acupoints.map(p => `<li>${p}</li>`).join('');
+
+            const herbs = data.herbs || [];
+            document.getElementById('herbsList').innerHTML = herbs.map(h => `<div class="tag">${h}</div>`).join('');
+
+            // Content recommendations
+            renderContentRecommendations(data);
+        }
+
+        function animateScore(targetScore) {
+            gsap.to('#scoreNumber', {
+                innerHTML: targetScore,
+                duration: 2,
+                snap: { innerHTML: 1 },
+                ease: 'power2.out'
+            });
+        }
+
+        function renderHealthMap(data) {
+            const mapData = [
+                {
+                    icon: '🌋',
+                    name: '压力火山区',
+                    area: '舌尖',
+                    status: data.health_score > 80 ? '正常' : '需要关注',
+                    index: data.health_score > 80 ? '低' : (data.health_score > 70 ? '中' : '高'),
+                    indexClass: data.health_score > 80 ? 'index-low' : (data.health_score > 70 ? 'index-medium' : 'index-high')
+                },
+                {
+                    icon: '🏔️',
+                    name: '疲劳高原区',
+                    area: '舌体',
+                    status: '正常',
+                    index: '中',
+                    indexClass: 'index-medium'
+                },
+                {
+                    icon: '🌊',
+                    name: '湿气沼泽区',
+                    area: '舌苔',
+                    status: data.constitution?.primary?.includes('湿') ? '需要改善' : '良好',
+                    index: data.constitution?.primary?.includes('湿') ? '高' : '低',
+                    indexClass: data.constitution?.primary?.includes('湿') ? 'index-high' : 'index-low'
+                }
+            ];
+
+            const html = mapData.map(region => `
+                <div class="map-region">
+                    <div class="region-icon">${region.icon}</div>
+                    <div class="region-name">${region.name}</div>
+                    <div class="region-status">${region.area} · ${region.status}</div>
+                    <span class="region-index ${region.indexClass}">${region.index}指数</span>
+                </div>
+            `).join('');
+
+            document.getElementById('healthMapGrid').innerHTML = html;
+        }
+
+        function assignPlanet(data) {
+            const score = data.health_score || 75;
+            let planet = {};
+
+            if (score >= 90) {
+                planet = {
+                    icon: '🌕',
+                    name: '完美健康星球',
+                    population: '2.3万',
+                    stories: '1,234',
+                    tips: '567',
+                    desc: '恭喜！你与最健康的人群在同一个星球'
+                };
+            } else if (score >= 80) {
+                planet = {
+                    icon: '🌟',
+                    name: '健康星球',
+                    population: '8.9万',
+                    stories: '3,456',
+                    tips: '1,234',
+                    desc: '你的健康状态良好，与众多健康居民在一起'
+                };
+            } else if (score >= 70) {
+                planet = {
+                    icon: '🪐',
+                    name: data.constitution?.primary + '星球',
+                    population: '15.7万',
+                    stories: '8,901',
+                    tips: '3,456',
+                    desc: `与你相似${data.constitution?.primary}的人组成了这个互助社区`
+                };
+            } else {
+                planet = {
+                    icon: '🔴',
+                    name: '改善星球',
+                    population: '12.1万',
+                    stories: '12,345',
+                    tips: '5,678',
+                    desc: '这里有最多的改善经验和成功故事'
+                };
+            }
+
+            document.getElementById('planetIcon').textContent = planet.icon;
+            document.getElementById('planetName').textContent = planet.name;
+            document.getElementById('planetDesc').textContent = planet.desc;
+            document.getElementById('planetPopulation').textContent = planet.population;
+            document.getElementById('planetStories').textContent = planet.stories;
+            document.getElementById('planetTips').textContent = planet.tips;
+        }
+
+        function renderContentRecommendations(data) {
+            const constitution = data.constitution?.primary || '';
+            const recommendations = [
+                {
+                    type: '🌟 改善故事',
+                    title: `从${constitution}到健康，我的90天逆袭`,
+                    desc: '真实用户分享：通过食疗和运动，健康评分从72分提升到88分...',
+                    views: '12.3K',
+                    likes: '2.1K'
+                },
+                {
+                    type: '📖 健康攻略',
+                    title: `${constitution}的完整调理指南`,
+                    desc: '中医专家详解：症状、成因、调理方法全攻略...',
+                    views: '8.9K',
+                    likes: '1.5K'
+                },
+                {
+                    type: '🍲 食疗方案',
+                    title: `${constitution}一周食谱（含做法）`,
+                    desc: '营养师推荐：7天早中晚餐食谱，简单易做又有效...',
+                    views: '15.6K',
+                    likes: '3.2K'
+                }
+            ];
+
+            const html = recommendations.map(item => `
+                <div class="content-card" onclick="alert('内容详情页开发中...')">
+                    <div class="content-type">${item.type}</div>
+                    <div class="content-title">${item.title}</div>
+                    <div class="content-desc">${item.desc}</div>
+                    <div class="content-meta">
+                        <span>👁️ ${item.views}</span>
+                        <span>❤️ ${item.likes}</span>
+                    </div>
+                </div>
+            `).join('');
+
+            document.getElementById('contentRecommendations').innerHTML = html;
+        }
+
+        function shareReport() {
+            const shareText = `我在AI舌象分析中得了${resultData.health_score}分！属于${resultData.constitution?.primary || '健康'}星球 🌟`;
+
+            if (navigator.share) {
+                navigator.share({
+                    title: '我的健康地图',
+                    text: shareText,
+                    url: window.location.href
+                }).catch(err => console.log('分享失败', err));
+            } else {
+                navigator.clipboard.writeText(shareText + '\n舌观世界，洞见自己')
+                    .then(() => alert('已复制到剪贴板！'))
+                    .catch(() => alert('请手动复制分享'));
+            }
+        }
+    </script>
+</body>
+</html>
