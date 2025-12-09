@@ -22,7 +22,13 @@ analyzer = TongueAnalyzer()
 
 @app.route('/')
 def index():
-    """首页 - 舌象分析入口"""
+    """首页 - 健康星球探索"""
+    return demo()
+
+
+@app.route('/upload')
+def upload():
+    """上传页面 - 舌象分析入口"""
     return render_template('tongue_demo/index.html')
 
 

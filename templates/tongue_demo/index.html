@@ -109,6 +109,27 @@
             animation: fadeInDown 0.8s ease;
         }
 
+        .home-link {
+            display: inline-block;
+            color: white;
+            text-decoration: none;
+            margin-bottom: 30px;
+            padding: 12px 30px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50px;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            font-weight: 600;
+        }
+
+        .home-link:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.6);
+            transform: translateX(-5px);
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.5);
+        }
+
         h1 {
             font-size: clamp(48px, 8vw, 80px);
             font-weight: 800;
@@ -541,6 +562,7 @@
 
     <div class="container">
         <header>
+            <a href="/" class="home-link">← 返回星球探索</a>
             <h1>AI舌象分析</h1>
             <p class="subtitle">30秒智能诊断 · 基于深度学习与中医智慧 · 个性化健康方案</p>
         </header>
