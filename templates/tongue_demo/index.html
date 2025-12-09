@@ -232,6 +232,47 @@
             font-weight: 400;
         }
 
+        /* Privacy Notice */
+        .privacy-notice {
+            margin-top: 20px;
+            padding: 16px 24px;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            animation: fadeIn 0.5s ease 0.3s backwards;
+        }
+
+        .privacy-notice .icon {
+            font-size: 24px;
+            flex-shrink: 0;
+        }
+
+        .privacy-notice .text {
+            font-size: 14px;
+            color: #a7f3d0;
+            line-height: 1.6;
+            font-weight: 500;
+        }
+
+        .privacy-notice .text strong {
+            color: #6ee7b7;
+            font-weight: 700;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
         #fileInput {
             display: none;
         }
@@ -509,6 +550,14 @@
                 <div class="upload-icon">📸</div>
                 <div class="upload-text">上传舌象照片</div>
                 <div class="upload-hint">点击或拖拽 · 支持 JPG/PNG/WEBP · 最大16MB</div>
+            </div>
+
+            <!-- Privacy Notice -->
+            <div class="privacy-notice">
+                <div class="icon">🔒</div>
+                <div class="text">
+                    <strong>隐私保护承诺：</strong>您的照片仅用于即时分析，<strong>不会被保存或存储</strong>。分析完成后立即删除，请放心上传。
+                </div>
             </div>
 
             <input type="file" id="fileInput" accept="image/*" onchange="handleFileSelect(event)">
