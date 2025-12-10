@@ -1063,9 +1063,16 @@
                         <div class="question-icon">🎯</div>
                         <div class="question-content">
                             <div class="question-text">你希望三个月后身体达到什么状态？</div>
-                            <textarea class="answer-input" placeholder="说说你的健康目标..." rows="3"></textarea>
+                            <textarea class="answer-input" id="healthGoal" placeholder="说说你的健康目标..." rows="3"></textarea>
                         </div>
                     </div>
+                </div>
+
+                <!-- Submit Button -->
+                <div style="text-align: center; margin-top: 30px;">
+                    <button class="btn btn-primary" onclick="saveHealthDialogue()" style="padding: 16px 50px;">
+                        💾 保存我的健康目标
+                    </button>
                 </div>
             </div>
 
@@ -1635,6 +1642,51 @@
                     console.log(`Question: ${questionText}, Answer: ${answer}`);
                 });
             });
+        }
+
+        // ========== Save Health Dialogue ==========
+        function saveHealthDialogue() {
+            // Collect all answers
+            const sleepQuality = document.querySelector('.option-btn.selected[data-answer]')?.dataset.answer;
+            const duration = document.querySelectorAll('.option-btn.selected')[1]?.dataset.answer;
+            const healthGoal = document.getElementById('healthGoal')?.value;
+
+            // Validation
+            if (!sleepQuality || !duration || !healthGoal) {
+                alert('请完整回答所有问题后再提交 ✍️\n\nPlease answer all questions before submitting!');
+                return;
+            }
+
+            // Create dialogue data object
+            const dialogueData = {
+                sleepQuality: sleepQuality,
+                symptomDuration: duration,
+                healthGoal: healthGoal,
+                constitution: resultData.constitution?.primary,
+                healthScore: resultData.health_score,
+                timestamp: new Date().toISOString()
+            };
+
+            // Save to sessionStorage
+            sessionStorage.setItem('healthDialogue', JSON.stringify(dialogueData));
+
+            // Show success message
+            alert('✅ 保存成功！\n\n你的健康目标已记录：\n"' + healthGoal + '"\n\n我们将根据你的目标，为你提供个性化的改善方案！\n\n🎯 下一步：查看推荐的健康内容，开始你的改善之旅！');
+
+            // Scroll to recommendations
+            document.getElementById('contentRecommendations').scrollIntoView({
+                behavior: 'smooth',
+                block: 'center'
+            });
+
+            // Add visual feedback - highlight recommendations section
+            const recoSection = document.getElementById('contentRecommendations').parentElement.parentElement;
+            recoSection.style.border = '2px solid #6366f1';
+            setTimeout(() => {
+                recoSection.style.border = '';
+            }, 3000);
+
+            console.log('Health Dialogue Saved:', dialogueData);
         }
 
         // ========== Future Health Prediction ==========
