@@ -16,8 +16,19 @@ app.config['UPLOAD_FOLDER'] = 'uploads/tongues'
 # 确保上传目录存在
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
-# 初始化分析器（如果没有API密钥，会自动使用规则引擎）
-analyzer = TongueAnalyzer()
+# 初始化分析器 - 使用免费的智谱AI GLM-4V
+# 优先使用环境变量，如果没有则使用FreeTongueAnalyzer
+api_key = os.getenv('ZHIPU_API_KEY') or os.getenv('GLM_API_KEY')
+
+if api_key:
+    # 使用免费的智谱AI GLM-4V
+    from free_analyzer import FreeTongueAnalyzer
+    analyzer = FreeTongueAnalyzer()
+    print("✅ 使用智谱AI GLM-4V 免费分析器")
+else:
+    # 如果没有API密钥，使用规则引擎
+    analyzer = TongueAnalyzer()
+    print("⚠️  使用规则引擎模式")
 
 
 @app.route('/')
@@ -180,7 +191,17 @@ if __name__ == '__main__':
     print("=" * 60)
     print("🔬 AI舌象分析Demo启动中...")
     print("=" * 60)
-    print(f"📊 分析引擎: {analyzer.provider if not analyzer.use_mock else '规则引擎'}")
+
+    # 检测分析器类型
+    if api_key and hasattr(analyzer, '__class__') and analyzer.__class__.__name__ == 'FreeTongueAnalyzer':
+        print(f"📊 分析引擎: 智谱AI GLM-4V (免费)")
+    elif hasattr(analyzer, 'use_mock') and analyzer.use_mock:
+        print(f"📊 分析引擎: 规则引擎")
+    elif hasattr(analyzer, 'provider'):
+        print(f"📊 分析引擎: {analyzer.provider}")
+    else:
+        print(f"📊 分析引擎: 未知")
+
     print(f"🌐 访问地址: http://localhost:5001")
     print(f"📁 上传目录: {app.config['UPLOAD_FOLDER']}")
     print("=" * 60)

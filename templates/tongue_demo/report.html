@@ -1181,7 +1181,10 @@
             <!-- Content Recommendations -->
             <div class="glass-card">
                 <div class="recommendations-section">
-                    <div class="section-title">📚 为你推荐的健康故事</div>
+                    <div class="section-title">🎯 根据你的舌象，为你推荐</div>
+                    <p style="color: var(--text-secondary); margin-bottom: 25px; line-height: 1.8;">
+                        这些内容与你的体质密切相关，帮助你从<strong>心理健康、职场压力、生活方式</strong>等多个维度改善健康
+                    </p>
                     <div class="content-grid" id="contentRecommendations"></div>
                 </div>
             </div>
@@ -1355,39 +1358,241 @@
         }
 
         function renderContentRecommendations(data) {
-            const constitution = data.constitution?.primary || '';
-            const recommendations = [
-                {
-                    type: '🌟 改善故事',
-                    title: `从${constitution}到健康，我的90天逆袭`,
-                    desc: '真实用户分享：通过食疗和运动，健康评分从72分提升到88分...',
-                    views: '12.3K',
-                    likes: '2.1K'
-                },
-                {
-                    type: '📖 健康攻略',
-                    title: `${constitution}的完整调理指南`,
-                    desc: '中医专家详解：症状、成因、调理方法全攻略...',
-                    views: '8.9K',
-                    likes: '1.5K'
-                },
-                {
-                    type: '🍲 食疗方案',
-                    title: `${constitution}一周食谱（含做法）`,
-                    desc: '营养师推荐：7天早中晚餐食谱，简单易做又有效...',
-                    views: '15.6K',
-                    likes: '3.2K'
+            const constitution = data.constitution?.primary || '平和';
+            const healthScore = data.health_score || 75;
+            const tongueColor = data.tongue_body?.color || '';
+            const coating = data.tongue_coating?.thickness || '';
+
+            // 🧠 智能推荐系统 - 根据舌象特征推荐相关健康内容
+            const recommendationDatabase = {
+                // 气虚质 → 工作压力、疲劳、职场健康
+                '气虚': [
+                    {
+                        type: '🧠 心理健康',
+                        title: '996工作制下的自我拯救：如何对抗慢性疲劳',
+                        desc: '气虚往往源于长期工作压力。心理咨询师分享：如何在高压环境下保持心理健康...',
+                        views: '23.5K',
+                        likes: '4.2K',
+                        tags: ['职场压力', '心理健康', '疲劳管理']
+                    },
+                    {
+                        type: '💼 职场健康',
+                        title: '程序员/白领的能量管理指南',
+                        desc: '久坐+加班导致的气虚怎么办？时间管理专家教你如何高效工作不透支身体...',
+                        views: '18.9K',
+                        likes: '3.1K',
+                        tags: ['职场', '能量管理']
+                    },
+                    {
+                        type: '📖 健康百科',
+                        title: '气虚的真相：不是懒，是身体在求救',
+                        desc: '为什么总是提不起劲？中医+心理学双重视角解读气虚背后的深层原因...',
+                        views: '31.2K',
+                        likes: '5.8K',
+                        tags: ['中医科普', '自我认知']
+                    }
+                ],
+                // 血瘀质 → 久坐、血液循环、办公室综合症
+                '血瘀': [
+                    {
+                        type: '💼 职场健康',
+                        title: '久坐族必看：办公室微运动拯救你的血液循环',
+                        desc: '每天8小时坐着？血瘀悄悄找上门。5分钟办公室运动法，改善血液循环...',
+                        views: '27.3K',
+                        likes: '4.9K',
+                        tags: ['久坐', '办公室健康']
+                    },
+                    {
+                        type: '🧠 心理健康',
+                        title: '身体的疼痛，可能是心理压力的信号',
+                        desc: '血瘀导致的身体疼痛，往往与长期心理压力有关。心身医学专家深度解读...',
+                        views: '15.6K',
+                        likes: '2.7K',
+                        tags: ['心身健康', '压力管理']
+                    },
+                    {
+                        type: '🌟 改善故事',
+                        title: '从"办公室僵尸"到活力满满：我的3个月逆袭',
+                        desc: '真实案例：一个30岁白领如何通过调理血瘀，重获健康和自信...',
+                        views: '19.8K',
+                        likes: '3.4K',
+                        tags: ['真实案例', '白领健康']
+                    }
+                ],
+                // 阴虚质 → 失眠、焦虑、熬夜
+                '阴虚': [
+                    {
+                        type: '🧠 心理健康',
+                        title: '失眠焦虑？可能是阴虚在作怪',
+                        desc: '为什么越想睡越睡不着？心理咨询师+中医专家联合解读失眠背后的原因...',
+                        views: '35.7K',
+                        likes: '6.3K',
+                        tags: ['失眠', '焦虑', '心理健康']
+                    },
+                    {
+                        type: '💼 职场健康',
+                        title: '熬夜加班党的自救手册',
+                        desc: '长期熬夜导致阴虚火旺？互联网大厂员工亲测有效的补救方法...',
+                        views: '28.4K',
+                        likes: '5.1K',
+                        tags: ['熬夜', '加班', '自救']
+                    },
+                    {
+                        type: '📖 健康百科',
+                        title: '年轻人的隐形杀手：阴虚体质完全解析',
+                        desc: '为什么年轻人也会阴虚？现代生活方式如何偷走你的"阴液"...',
+                        views: '22.1K',
+                        likes: '3.9K',
+                        tags: ['年轻人健康', '现代病']
+                    }
+                ],
+                // 湿热质 → 饮食、代谢、肥胖
+                '湿热': [
+                    {
+                        type: '💼 职场健康',
+                        title: '外卖族的健康陷阱：湿热是怎么吃出来的',
+                        desc: '天天点外卖？小心湿热体质找上门。营养师教你如何健康吃外卖...',
+                        views: '26.9K',
+                        likes: '4.7K',
+                        tags: ['饮食健康', '外卖族']
+                    },
+                    {
+                        type: '🧠 心理健康',
+                        title: '肥胖、痘痘背后的心理压力',
+                        desc: '湿热导致的外在问题，可能影响自信和社交。心理咨询师教你重建自信...',
+                        views: '17.8K',
+                        likes: '3.2K',
+                        tags: ['自信', '身材焦虑']
+                    },
+                    {
+                        type: '🌟 改善故事',
+                        title: '3个月减重15斤，告别湿热体质',
+                        desc: '真实分享：一个设计师如何通过调理湿热，实现健康瘦身和皮肤改善...',
+                        views: '33.5K',
+                        likes: '6.1K',
+                        tags: ['减肥', '真实案例']
+                    }
+                ],
+                // 痰湿质 → 代谢、肥胖、慢性病
+                '痰湿': [
+                    {
+                        type: '💼 职场健康',
+                        title: '久坐+外卖=痰湿？办公室族的健康危机',
+                        desc: '为什么你总是感觉身体沉重？职业健康专家揭秘现代生活方式的危害...',
+                        views: '21.3K',
+                        likes: '3.8K',
+                        tags: ['久坐', '代谢']
+                    },
+                    {
+                        type: '📖 健康百科',
+                        title: '痰湿体质：年轻人的隐形健康炸弹',
+                        desc: '痰湿不仅影响体重，还可能导致三高、脂肪肝...医生详解预防策略...',
+                        views: '19.7K',
+                        likes: '3.5K',
+                        tags: ['预防', '慢性病']
+                    },
+                    {
+                        type: '🌟 改善故事',
+                        title: '从"油腻中年"到精神小伙：我的逆龄之路',
+                        desc: '35岁程序员通过调理痰湿，体重、血脂、精神状态全面改善的经历...',
+                        views: '24.6K',
+                        likes: '4.4K',
+                        tags: ['真实案例', '中年健康']
+                    }
+                ],
+                // 气郁质 → 焦虑、抑郁、心理健康
+                '气郁': [
+                    {
+                        type: '🧠 心理健康',
+                        title: '气郁体质？你可能需要心理咨询',
+                        desc: '长期情绪压抑导致气郁。心理咨询师教你如何疏导情绪，打开心结...',
+                        views: '29.8K',
+                        likes: '5.4K',
+                        tags: ['心理咨询', '情绪管理']
+                    },
+                    {
+                        type: '💼 职场健康',
+                        title: '职场PUA与气郁：如何保护自己的心理健康',
+                        desc: '工作环境中的负面情绪如何影响身体？职场心理专家教你应对策略...',
+                        views: '32.4K',
+                        likes: '5.9K',
+                        tags: ['职场心理', '情绪保护']
+                    },
+                    {
+                        type: '📖 健康百科',
+                        title: '气郁的深层原因：心理与生理的恶性循环',
+                        desc: '为什么总是心情低落？中医+心理学双重视角解读气郁...',
+                        views: '18.5K',
+                        likes: '3.3K',
+                        tags: ['心理科普', '中医心理学']
+                    }
+                ],
+                // 平和质 → 预防、保持、生活方式
+                '平和': [
+                    {
+                        type: '💼 职场健康',
+                        title: '健康的人如何保持健康？预防大于治疗',
+                        desc: '体质平和不代表可以放松警惕。职业健康专家教你如何维持最佳状态...',
+                        views: '16.2K',
+                        likes: '2.9K',
+                        tags: ['预防', '健康维护']
+                    },
+                    {
+                        type: '🧠 心理健康',
+                        title: '心理健康自测：你真的没有隐藏的压力吗？',
+                        desc: '身体健康不等于心理健康。做个测试，看看你的心理压力指数...',
+                        views: '24.7K',
+                        likes: '4.5K',
+                        tags: ['心理测试', '自我认知']
+                    },
+                    {
+                        type: '📖 健康百科',
+                        title: '年轻人的健康投资：30岁前该知道的事',
+                        desc: '平和体质如何保持到老年？医生分享最实用的健康投资建议...',
+                        views: '21.9K',
+                        likes: '3.9K',
+                        tags: ['预防医学', '长期健康']
+                    }
+                ]
+            };
+
+            // 根据体质匹配推荐内容
+            let recommendations = [];
+            for (const [key, contents] of Object.entries(recommendationDatabase)) {
+                if (constitution.includes(key)) {
+                    recommendations = contents;
+                    break;
                 }
-            ];
+            }
+
+            // 如果没匹配到，使用平和质的推荐
+            if (recommendations.length === 0) {
+                recommendations = recommendationDatabase['平和'];
+            }
+
+            // 如果健康评分较低，额外推荐心理健康内容
+            if (healthScore < 70) {
+                recommendations.unshift({
+                    type: '🧠 心理健康',
+                    title: '身体不适背后的心理压力：你需要了解的真相',
+                    desc: '长期健康问题可能影响心理状态，而心理压力又会加重身体症状。打破恶性循环...',
+                    views: '42.1K',
+                    likes: '7.8K',
+                    tags: ['心身医学', '压力管理', '自我疗愈']
+                });
+            }
 
             const html = recommendations.map(item => `
-                <div class="content-card" onclick="alert('内容详情页开发中...')">
+                <div class="content-card" onclick="alert('内容详情页开发中...\\n\\n文章标题：${item.title}\\n分类：${item.type}\\n\\n这将链接到健康百科和博客内容！')">
                     <div class="content-type">${item.type}</div>
                     <div class="content-title">${item.title}</div>
                     <div class="content-desc">${item.desc}</div>
                     <div class="content-meta">
                         <span>👁️ ${item.views}</span>
                         <span>❤️ ${item.likes}</span>
+                    </div>
+                    <div class="tag-grid" style="margin-top: 12px;">
+                        ${item.tags.map(tag => `<div class="tag" style="font-size: 12px; padding: 4px 10px;">#${tag}</div>`).join('')}
                     </div>
                 </div>
             `).join('');

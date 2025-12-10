@@ -1,0 +1,71 @@
+{
+  "tongue_body": {
+    "color": "淡红",
+    "color_description": "舌头颜色偏淡红色，表明体内气血充足。",
+    "shape": "正常",
+    "teeth_marks": "无",
+    "cracks": "无"
+  },
+  "tongue_coating": {
+    "color": "薄白",
+    "thickness": "薄",
+    "texture": "润",
+    "distribution": "均匀覆盖"
+  },
+  "constitution": {
+    "primary": "平和",
+    "secondary": [],
+    "description": "整体来看，舌象显示体质较为平和，无明显偏颇。"
+  },
+  "pathology": {
+    "nature": [
+      "无"
+    ],
+    "location": [
+      "无"
+    ],
+    "severity": "无"
+  },
+  "health_score": 90,
+  "score_level": "良好",
+  "advice": {
+    "diet": {
+      "recommended": [
+        {
+          "food": "蔬菜水果",
+          "reason": "富含维生素和纤维",
+          "method": "适量食用"
+        },
+        {
+          "food": "谷物杂粮",
+          "reason": "提供能量",
+          "method": "作为主食"
+        }
+      ],
+      "avoid": []
+    },
+    "lifestyle": {
+      "sleep": "保证7-8小时睡眠时间",
+      "exercise": "每天适度运动，如散步或瑜伽",
+      "emotion": "保持心情愉悦，避免过度压力"
+    },
+    "herbal_formula": {
+      "name": "",
+      "ingredients": [],
+      "effect": ""
+    },
+    "acupoints": [
+      {
+        "name": "足三里",
+        "location": "小腿外侧，犊鼻下3寸",
+        "method": "按揉",
+        "effect": "增强免疫力"
+      }
+    ]
+  },
+  "summary": "体质平和，建议继续保持健康的生活习惯。",
+  "disclaimer": "此分析仅供参考，不能替代医生诊断。",
+  "provider": "zhipu-ai",
+  "model": "glm-4v-flash",
+  "cost": "免费"
+}

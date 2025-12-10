@@ -146,7 +146,7 @@ class FreeTongueAnalyzer:
 请基于图片实际特征分析，使用通俗易懂的语言，提供安全可操作的建议。"""
 
         try:
-            # 调用智谱AI API
+            # 调用智谱AI API (使用正确的格式)
             response = self.client.chat.completions.create(
                 model="glm-4v-flash",  # 免费的视觉模型
                 messages=[
@@ -156,7 +156,7 @@ class FreeTongueAnalyzer:
                             {
                                 "type": "image_url",
                                 "image_url": {
-                                    "url": f"data:image/jpeg;base64,{image_data}"
+                                    "url": image_data  # 直接使用base64字符串，不需要data:前缀
                                 }
                             },
                             {
@@ -165,9 +165,7 @@ class FreeTongueAnalyzer:
                             }
                         ]
                     }
-                ],
-                temperature=0.7,
-                max_tokens=2000
+                ]
             )
 
             ai_response = response.choices[0].message.content
