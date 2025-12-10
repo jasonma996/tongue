@@ -1,26 +1,28 @@
 """
 AI舌象分析器
-支持智谱AI GLM-4V-Flash（免费）和通义千问Qwen-VL
+支持智谱AI GLM-4V-Flash（免费）、通义千问Qwen-VL 和 DeepSeek 3.2
 """
 
 import os
 import json
 import base64
 from typing import Dict, Any, Optional
+from tongue_feature_extractor import TongueFeatureExtractor
 
 class TongueAnalyzer:
     """舌象分析器基类"""
 
-    def __init__(self, api_key: str = None, provider: str = "zhipu"):
+    def __init__(self, api_key: str = None, provider: str = "deepseek"):
         """
         初始化分析器
 
         Args:
             api_key: API密钥
-            provider: 'zhipu' 或 'qwen'
+            provider: 'zhipu' 或 'qwen' 或 'deepseek'
         """
-        self.api_key = api_key or os.getenv('AI_API_KEY')
+        self.api_key = api_key or os.getenv('DEEPSEEK_API_KEY') or os.getenv('AI_API_KEY')
         self.provider = provider
+        self.feature_extractor = TongueFeatureExtractor()
 
         if not self.api_key:
             print("⚠️  未设置API密钥，将使用规则引擎模式")
@@ -41,6 +43,13 @@ class TongueAnalyzer:
                 dashscope.api_key = self.api_key
                 self.client = dashscope
                 print("✅ 通义千问客户端初始化成功")
+            elif self.provider == "deepseek":
+                from openai import OpenAI
+                self.client = OpenAI(
+                    api_key=self.api_key,
+                    base_url="https://api.deepseek.com"
+                )
+                print("✅ DeepSeek客户端初始化成功")
         except ImportError as e:
             print(f"⚠️  {self.provider} SDK未安装，切换到规则引擎模式")
             self.use_mock = True
@@ -62,6 +71,8 @@ class TongueAnalyzer:
             return self._analyze_with_zhipu(image_path)
         elif self.provider == "qwen":
             return self._analyze_with_qwen(image_path)
+        elif self.provider == "deepseek":
+            return self._analyze_with_deepseek(image_path)
 
     def _analyze_with_zhipu(self, image_path: str) -> Dict[str, Any]:
         """使用智谱AI分析"""
@@ -149,6 +160,96 @@ class TongueAnalyzer:
 
         except Exception as e:
             print(f"❌ API调用失败: {e}")
+            return self._mock_analysis(image_path)
+
+    def _analyze_with_deepseek(self, image_path: str) -> Dict[str, Any]:
+        """使用 DeepSeek 3.2 + 图像特征提取分析"""
+
+        try:
+            # Step 1: 使用 OpenCV 提取图像特征
+            print("🔍 正在提取舌象特征...")
+            features = self.feature_extractor.extract_features(image_path)
+
+            # Step 2: 构建提示词
+            prompt = f"""你是一位经验丰富的中医舌诊专家。我已经通过图像分析提取了以下舌象特征：
+
+【舌象特征数据】
+1. 舌质颜色：{features['tongue_color']['type']} ({features['tongue_color']['description']})
+2. 舌苔状态：{features['coating']['description']}
+   - 舌苔厚薄：{features['coating']['thickness']}
+   - 舌苔颜色：{features['coating']['color']}
+3. 舌形特征：{features['shape']['description']}
+4. 舌面纹理：{features['texture']['description']}
+
+【特征总结】
+{features['summary']}
+
+请根据以上舌象特征，从中医角度进行专业分析，并返回JSON格式的健康报告。
+
+【输出格式 - 严格JSON】
+{{
+  "tongue_body": {{
+    "color": "舌色描述",
+    "shape": "舌形描述",
+    "features": ["特征1", "特征2"]
+  }},
+  "tongue_coating": {{
+    "color": "苔色",
+    "thickness": "厚/薄",
+    "texture": "质地描述"
+  }},
+  "constitution": {{
+    "primary": "主要体质类型（气虚质/血瘀质/阴虚质/阳虚质/湿热质/痰湿质/气郁质/特禀质/平和质）",
+    "secondary": ["次要体质"],
+    "description": "体质说明（50字内，通俗易懂）"
+  }},
+  "health_score": 数字分数(0-100),
+  "score_level": "优秀/良好/一般/较差",
+  "advice": {{
+    "diet": {{
+      "recommended": ["🥦 食物1", "🍎 食物2", "🐟 食物3"],
+      "avoid": ["❌ 禁忌1", "❌ 禁忌2"]
+    }},
+    "lifestyle": ["💤 建议1", "🏃 建议2", "😊 建议3"],
+    "acupoints": ["✋ 穴位1（位置+功效）", "✋ 穴位2"]
+  }},
+  "herbs": ["🌿 中药1（功效）", "🌿 中药2", "🌿 中药3"],
+  "summary": "一句话总结（30字内，积极正向）"
+}}
+
+注意：使用emoji增加趣味性，语言通俗易懂，避免过于专业的术语。"""
+
+            # Step 3: 调用 DeepSeek API
+            print("🤖 DeepSeek 3.2 分析中...")
+            response = self.client.chat.completions.create(
+                model="deepseek-chat",
+                messages=[
+                    {
+                        "role": "system",
+                        "content": "你是一位专业的中医舌诊专家，擅长根据舌象特征进行健康分析和体质辨识。"
+                    },
+                    {
+                        "role": "user",
+                        "content": prompt
+                    }
+                ],
+                temperature=0.7,
+                max_tokens=2000
+            )
+
+            ai_response = response.choices[0].message.content
+
+            # 解析JSON
+            result = self._parse_json_response(ai_response)
+            result['provider'] = 'deepseek'
+            result['model'] = 'deepseek-chat'
+            result['extracted_features'] = features
+
+            print("✅ DeepSeek 分析完成")
+            return result
+
+        except Exception as e:
+            print(f"❌ DeepSeek API调用失败: {e}")
             return self._mock_analysis(image_path)
 
     def _parse_json_response(self, response: str) -> Dict[str, Any]:
